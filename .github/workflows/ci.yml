@@ -61,7 +61,7 @@ jobs:
         with:
           packages: platforms;android-34 build-tools;34.0.0
       - uses: gradle/actions/setup-gradle@748248ddd2a24f49513d8f472f81c3a07d4d50e1 # v4.4.4
-            - name: Restore signing keystore
+      - name: Restore signing keystore
         if: github.event_name == 'push'
         env:
           KEYSTORE_B64: ${{ secrets.CLEANYOURTV_KEYSTORE_B64 }}
