@@ -1,7 +1,8 @@
 plugins {
     id 'com.android.application'
 }
-
+def privateKeystore = System.getenv('CLEANYOURTV_KEYSTORE_FILE')
+def privatePassword = System.getenv('CLEANYOURTV_KEYSTORE_PASSWORD')
 android {
     namespace 'com.gathin.tvhome'
     compileSdk 34
@@ -16,7 +17,17 @@ android {
         versionCode 14
         versionName '3.5'
     }
-
+    signingConfigs {
+        if (privateKeystore && privatePassword) {
+            personal {
+                storeFile file(privateKeystore)
+                storePassword privatePassword
+                keyAlias 'cleanyourtv'
+                keyPassword privatePassword
+                storeType 'PKCS12'
+            }
+        }
+    }
     buildTypes {
         release {
             // R8 strips and optimises the code (AndroidX included): smaller APK, faster start on a slow TV CPU.
@@ -24,7 +35,8 @@ android {
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             // Sideloaded over ADB, never published: sign with the debug key so it installs over a debug build.
-            signingConfig signingConfigs.debug
+            signingConfig(privateKeystore && privatePassword
+        ? signingConfigs.personal : signingConfigs.debug)
         }
     }
 
