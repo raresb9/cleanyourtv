@@ -2610,6 +2610,20 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
             } catch (PackageManager.NameNotFoundException e) {
                 continue;
             }
+            if ("com.tcl.ui_mediaCenter".equals(pkg)) {
+    Bitmap folder = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888);
+    Canvas canvas = new Canvas(folder);
+    Paint white = new Paint(Paint.ANTI_ALIAS_FLAG);
+    white.setColor(Color.WHITE);
+    white.setStyle(Paint.Style.STROKE);
+    white.setStrokeWidth(size * 0.085f);
+    canvas.drawRoundRect(size * .12f, size * .32f,
+            size * .88f, size * .82f, size * .08f, size * .08f, white);
+    canvas.drawLine(size * .17f, size * .32f, size * .17f, size * .20f, white);
+    canvas.drawLine(size * .17f, size * .20f, size * .44f, size * .20f, white);
+    canvas.drawLine(size * .44f, size * .20f, size * .54f, size * .32f, white);
+    logo = new BitmapDrawable(getResources(), folder);
+}
             TextView button = (TextView) getLayoutInflater().inflate(R.layout.top_app_button, bar, false);
             // pillKeys finds the bar's ends by id: without one of its own, every app button would be an end.
             button.setId(View.generateViewId());
@@ -2623,7 +2637,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
             if (inputId != null) button.setOnClickListener(v -> openInput(inputId));
             else button.setOnClickListener(v -> open(new Intent(target)));
             // After the network pill and the VPN pill; the Hebrew bar runs the other way, so before both there.
-            bar.addView(button, bar.indexOfChild(getResources().getBoolean(R.bool.rtl_menu_bar) ? btnVpn : btnWifi));
+            bar.addView(button, 0);
             topAppButtons.add(button);
         }
     }
