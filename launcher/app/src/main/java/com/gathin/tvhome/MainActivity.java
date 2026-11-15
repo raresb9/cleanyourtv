@@ -2635,7 +2635,71 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
             // An input: action switches the TV input, as the tile for the same app does.
             String inputId = LaunchActions.inputId(launchActions.get(pkg));
             if (inputId != null) button.setOnClickListener(v -> openInput(inputId));
-            else button.setOnClickListener(v -> open(new Intent(target)));
+            
+else if ("com.tcl.ui_mediaCenter".equals(pkg)) {
+    button.setOnClickListener(v -> {
+        View panel = getLayoutInflater().inflate(R.layout.popup_inputs, root, false);
+        LinearLayout rows = panel.findViewById(R.id.rows);
+        PopupWindow popup = glassPopup(panel, (int) (290 * density));
+
+        TextView heading = new TextView(this);
+        heading.setText("Media Player");
+        heading.setTextColor(Color.WHITE);
+        heading.setTextSize(19);
+        heading.setPadding((int) (16 * density), (int) (14 * density),
+                0, (int) (12 * density));
+        rows.addView(heading);
+
+        LinearLayout controls = new LinearLayout(this);
+        controls.setGravity(Gravity.CENTER);
+
+        int[] keys = {
+                KeyEvent.KEYCODE_MEDIA_PREVIOUS,
+                KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE,
+                KeyEvent.KEYCODE_MEDIA_NEXT
+        };
+        String[] symbols = {"⏮", "⏯", "⏭"};
+        String[] labels = {"Anterior", "Redare / Pauză", "Următor"};
+
+        for (int n = 0; n < keys.length; n++) {
+            final int mediaKey = keys[n];
+            TextView control = new TextView(this);
+            control.setText(symbols[n]);
+            control.setTextSize(27);
+            control.setTextColor(Color.WHITE);
+            control.setGravity(Gravity.CENTER);
+            control.setFocusable(true);
+            control.setContentDescription(labels[n]);
+            control.setBackgroundResource(R.drawable.input_row_bg);
+            control.setOnClickListener(view -> {
+                android.media.AudioManager audio =
+                        (android.media.AudioManager) getSystemService(AUDIO_SERVICE);
+                if (audio != null) {
+                    audio.dispatchMediaKeyEvent(
+                            new KeyEvent(KeyEvent.ACTION_DOWN, mediaKey));
+                    audio.dispatchMediaKeyEvent(
+                            new KeyEvent(KeyEvent.ACTION_UP, mediaKey));
+                }
+            });
+
+            LinearLayout.LayoutParams params =
+                    new LinearLayout.LayoutParams(0, (int) (54 * density), 1f);
+            int margin = (int) (4 * density);
+            params.setMargins(margin, 0, margin, 0);
+            controls.addView(control, params);
+        }
+
+        rows.addView(controls);
+        addSeparator(rows);
+        addInputRow(rows, popup, R.drawable.ic_input,
+                "Deschide TCL Media Center", -1,
+                () -> open(new Intent(target)));
+
+        dropIn(popup, panel, button, Gravity.END);
+        controls.getChildAt(1).requestFocus();
+    });
+} else button.setOnClickListener(v -> open(new Intent(target)));
+  
             // After the network pill and the VPN pill; the Hebrew bar runs the other way, so before both there.
             bar.addView(button, 0);
             topAppButtons.add(button);
